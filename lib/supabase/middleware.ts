@@ -36,11 +36,11 @@ export async function updateSession(request: NextRequest) {
 
   if (!user && isProtected) {
     const url = request.nextUrl.clone();
-    url.pathname = '/login';
+    url.pathname = '/auth/login';
     return NextResponse.redirect(url);
   }
 
-  if (user && (request.nextUrl.pathname === '/login' || request.nextUrl.pathname === '/signup')) {
+  if (user && (request.nextUrl.pathname === '/auth/login' || request.nextUrl.pathname === '/login' || request.nextUrl.pathname === '/signup')) {
     const url = request.nextUrl.clone();
     url.pathname = '/dashboard';
     return NextResponse.redirect(url);
