@@ -1,24 +1,25 @@
 import { createClient } from '@/lib/supabase/server';
-import { getDashboardStats } from '@/lib/actions/dashboard';
+import { getDashboardSummaryAction } from '@/lib/actions/dashboard';
 import Link from 'next/link';
 import { Inbox, Users, CheckSquare, FileText, Clock } from 'lucide-react';
 
 export default async function DashboardPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  const stats = await getDashboardStats();
+  const result = await getDashboardSummaryAction();
+  const stats = result?.data;
 
   const cards = [
-    { title: 'Inbox Items', value: stats?.inboxCount ?? 0, newCount: stats?.newInboxCount ?? 0, href: '/inbox', icon: Inbox, color: 'text-blue-400', bg: 'bg-blue-400/10' },
-    { title: 'Leads', value: stats?.leadsCount ?? 0, newCount: stats?.newLeadsCount ?? 0, href: '/leads', icon: Users, color: 'text-green-400', bg: 'bg-green-400/10' },
-    { title: 'Open Tasks', value: stats?.openTasksCount ?? 0, newCount: stats?.highPriorityTasksCount ?? 0, href: '/tasks', icon: CheckSquare, color: 'text-yellow-400', bg: 'bg-yellow-400/10' },
-    { title: 'Notes', value: stats?.notesCount ?? 0, newCount: 0, href: '/notes', icon: FileText, color: 'text-purple-400', bg: 'bg-purple-400/10' },
+    { title: 'Inbox Items', value: stats?.new_items ?? 0, newCount: stats?.needs_reply ?? 0, href: '/inbox', icon: Inbox, color: 'text-blue-400', bg: 'bg-blue-400/10' },
+    { title: 'Leads', value: stats?.leads_needing_followup ?? 0, newCount: 0, href: '/leads', icon: Users, color: 'text-green-400', bg: 'bg-green-400/10' },
+    { title: 'Open Tasks', value: stats?.open_tasks ?? 0, newCount: stats?.high_priority ?? 0, href: '/tasks', icon: CheckSquare, color: 'text-yellow-400', bg: 'bg-yellow-400/10' },
+    { title: 'Notes', value: 0, newCount: 0, href: '/notes', icon: FileText, color: 'text-purple-400', bg: 'bg-purple-400/10' },
   ];
 
   return (
     <div>
       <div className="mb-8">
-        <h2 className="text-2xl font-bold text-white">Welcome back {user?.email?.split('@')[0]} </h2>
+        <h2 className="text-2xl font-bold text-white">Welcome back {user?.email?.split('@')[0]}</h2>
         <p className="text-gray-400 mt-1">Your startup command center.</p>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-10">
@@ -29,7 +30,7 @@ export default async function DashboardPage() {
               <div className={`${bg} p-2 rounded-lg`}><Icon size={18} className={color} /></div>
             </div>
             <div className="text-3xl font-bold text-white">{value}</div>
-            {newCount > 0 && <div className="mt-2 text-xs text-indigo-400">{newCount} new</div>}
+            {newCount > 0 && <div className="mt-2 text-xs text-indigo-400">{newCount} need attention</div>}
           </Link>
         ))}
       </div>
